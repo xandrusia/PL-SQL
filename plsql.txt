@@ -1,0 +1,555 @@
+--select statement that joins at least two tables and contains GROUP BY claus-- Created by Vertabelo (http://vertabelo.com)
+-- Last modification date: 2020-05-11 20:28:04.138
+DROP table PatientsVisitors;
+DROP table DoctorSurgery;
+DROP table Surgery;
+DROP table PatientsCard;
+DROP table Patient;
+DROP table Visitors;
+DROP table Doctor;
+DROP TABLE DoctorHistory;
+
+-- tables
+-- Table: Doctor
+CREATE TABLE Doctor (
+    IdDoctor integer  NOT NULL,
+    docName varchar2(40)  NOT NULL,
+    docSurname varchar2(40)  NOT NULL,
+    specialization varchar2(50)  NOT NULL,
+    phoneNumber varchar2(9)  NOT NULL,
+    salary integer NOT NULL,
+    CONSTRAINT Doctor_pk PRIMARY KEY (IdDoctor)
+) ;
+
+
+CREATE TABLE DoctorHistory (
+    IdHDoctor integer  NOT NULL,
+    HdocName varchar2(40)  NOT NULL,
+    HdocSurname varchar2(40)  NOT NULL,
+    Hspecialization varchar2(50)  NOT NULL,
+    HphoneNumber varchar2(9)  NOT NULL,
+    Hsalary integer NOT NULL,
+    CONSTRAINT DoctorHistory_pk PRIMARY KEY (IdHDoctor)
+) ;
+
+-- Table: DoctorSurgery
+CREATE TABLE DoctorSurgery (
+    IdDSurgery integer  NOT NULL,
+    IdSurgery integer  NOT NULL,
+    IdDoctor integer  NOT NULL,
+    CONSTRAINT DoctorSurgery_pk PRIMARY KEY (IdDSurgery)
+) ;
+
+-- Table: Patient
+CREATE TABLE Patient (
+    IdPatient integer  NOT NULL,
+    Pname varchar2(40)  NOT NULL,
+    Psurname varchar2(40)  NOT NULL,
+    phoneNumber varchar(9) NOT NULL,
+    adress varchar2(50)  NOT NULL,
+    city varchar2(50)  NOT NULL,
+    zipCode varchar2(10)  NOT NULL,
+    dateOfBirth date  NOT NULL,
+    CONSTRAINT Patient_pk PRIMARY KEY (IdPatient)
+) ;
+
+-- Table: PatientsCard
+CREATE TABLE PatientsCard (
+    IdPatientCard integer  NOT NULL,
+    diagnose varchar2(50)  NOT NULL,
+    checkIn timestamp  NOT NULL,
+    checkOut timestamp  NOT NULL,
+    IdDoctor integer  NOT NULL,
+    IdPatient integer  NOT NULL,
+    CONSTRAINT PatientsCard_pk PRIMARY KEY (IdPatientCard)
+) ;
+
+-- Table: PatientsVisitors
+CREATE TABLE PatientsVisitors (
+    IdPVisitors integer  NOT NULL,
+    IdVisitors integer  NOT NULL,
+    IdPatient integer  NOT NULL,
+    CONSTRAINT PatientsVisitors_pk PRIMARY KEY (IdPVisitors)
+) ;
+
+-- Table: Surgery
+CREATE TABLE Surgery (
+    IdSurgery integer  NOT NULL,
+    startDate timestamp  NOT NULL,
+    enddate timestamp  NULL,
+    details varchar2(50)  NOT NULL,
+    IdPatientCard integer  NOT NULL,
+    CONSTRAINT Surgery_pk PRIMARY KEY (IdSurgery)
+) ;
+
+-- Table: Visitors
+CREATE TABLE Visitors (
+    IdVisitors integer  NOT NULL,
+    visitorName varchar2(50)  NOT NULL,
+    visitorSurname varchar2(50)  NOT NULL,
+    startOfVisit timestamp  NOT NULL,
+    endOfVisit timestamp  NOT NULL,
+    CONSTRAINT Visitors_pk PRIMARY KEY (IdVisitors)
+) ;
+
+-- foreign keys
+-- Reference: DoctorSurgery_Doctor (table: DoctorSurgery)
+ALTER TABLE DoctorSurgery ADD CONSTRAINT DoctorSurgery_Doctor
+    FOREIGN KEY (IdDoctor)
+    REFERENCES Doctor (IdDoctor);
+
+-- Reference: DoctorSurgery_Surgery (table: DoctorSurgery)
+ALTER TABLE DoctorSurgery ADD CONSTRAINT DoctorSurgery_Surgery
+    FOREIGN KEY (IdSurgery)
+    REFERENCES Surgery (IdSurgery);
+
+-- Reference: PatientsCard_Doctor (table: PatientsCard)
+ALTER TABLE PatientsCard ADD CONSTRAINT PatientsCard_Doctor
+    FOREIGN KEY (IdDoctor)
+    REFERENCES Doctor (IdDoctor);
+
+-- Reference: PatientsCard_Patient (table: PatientsCard)
+ALTER TABLE PatientsCard ADD CONSTRAINT PatientsCard_Patient
+    FOREIGN KEY (IdPatient)
+    REFERENCES Patient (IdPatient);
+
+-- Reference: PatientsVisitors_Patient (table: PatientsVisitors)
+ALTER TABLE PatientsVisitors ADD CONSTRAINT PatientsVisitors_Patient
+    FOREIGN KEY (IdPatient)
+    REFERENCES Patient (IdPatient);
+
+-- Reference: PatientsVisitors_Visitors (table: PatientsVisitors)
+ALTER TABLE PatientsVisitors ADD CONSTRAINT PatientsVisitors_Visitors
+    FOREIGN KEY (IdVisitors)
+    REFERENCES Visitors (IdVisitors);
+
+-- Reference: Surgery_PatientsCard (table: Surgery)
+ALTER TABLE Surgery ADD CONSTRAINT Surgery_PatientsCard
+    FOREIGN KEY (IdPatientCard)
+    REFERENCES PatientsCard (IdPatientCard);
+
+-- End of file.
+
+
+INSERT INTO Patient VALUES(0, 'Adam', 'Caban','123456789', 'Polna 1', 'Gdynia', 89-599, '2000-06-12');
+INSERT INTO Patient VALUES(1, 'Maja', 'Kowalczyk', '234567890', 'Polna 5', 'Kobylanka', 89-500, '1997-03-08');
+INSERT INTO Patient VALUES(2, 'Ada', 'Koserow', '232456676', 'Mylna 2', 'Warszawa', 00-195, '1981-02-12');
+INSERT INTO Patient VALUES(3, 'Zygmunt', 'Kowalczyk','999777555', 'Polna 5', 'Kobylanka', 89-500, '1965-11-12');
+INSERT INTO Patient VALUES(4, 'Aleksa', 'Kowal', '434435437', 'Stodolna 9', 'Gniezno', 99-980, '2003-12-01');
+
+INSERT INTO Doctor  VALUES(0,'Jan', 'Malysko', 'surgeon', 123456789, 6500); 
+INSERT INTO Doctor  VALUES(1,'Bogdan', 'Mazurek', 'pediatrist', 122156745, 2800); 
+INSERT INTO Doctor  VALUES(2,'Magdalena', 'Zoja', 'psychologist', 123466789, 3100); 
+INSERT INTO Doctor  VALUES(3,'Aleksy', 'Malczynski', 'surgeon', 123400089, 6100); 
+
+
+
+INSERT INTO PatientsCard VALUES(0, 'medium-size tumor', '2019-01-01 06:30:04', '2019-01-24 17:00:50', 0, 3);
+INSERT INTO PatientsCard VALUES(1, 'therapy after trauma', '2019-01-01 18:50:40', '2019-01-24 21:17:00', 2, 2);
+INSERT INTO PatientsCard VALUES(2, 'overgrown tonsils', '2019-01-01 11:00:32', '2019-01-24 14:46:44', 0, 1);
+INSERT INTO PatientsCard VALUES(3, 'flu and varicose veins surgary', '2019-02-03 10:39:12', '2019-02-26 23:00:34', 1, 0);
+INSERT INTO PatientsCard VALUES(4, 'plague', '2019-03-03 22:23:09', '2019-03-20 6:22:14', 1, 4);
+
+INSERT INTO Surgery  VALUES(0, '2019-01-02 12:00:04', '2019-01-02 04:00:07', 'tumor removal', 0);
+INSERT INTO Surgery  VALUES(1, '2019-01-02 12:00:04', '2019-01-02 04:00:07', 'surgery for varicose veins', 0);
+INSERT INTO Surgery  VALUES(2, '2019-01-02 12:00:04', '2019-01-02 04:00:07', 'tonsillectomy', 2);
+
+
+INSERT INTO Visitors VALUES(0, 'Alina', 'Kowalczyk', '2019-01-02 10:00:00', '2019-01-02 11:00:20');
+INSERT INTO Visitors VALUES(1, 'Alina', 'Kowalczyk', '2019-01-02 06:00:00', '2019-01-02 09:00:20');
+INSERT INTO Visitors VALUES(2, 'Genowefa', 'Caban', '2019-02-05 10:00:00', '2019-02-05 11:00:20');
+INSERT INTO Visitors VALUES(3, 'Genowefa', 'Caban', '2019-02-24 12:00:00', '2019-02-24 04:00:20');
+INSERT INTO Visitors VALUES(4, 'Maciej', 'Koserow', '2019-01-06 10:00:00', '2019-01-06 12:30:20');
+INSERT INTO Visitors VALUES(5, 'Leon', 'Maciejczuk', '2019-01-20 10:20:00', '2019-01-20 11:50:20');
+INSERT INTO Visitors VALUES(6, 'Felicjusz', 'Zielony', '2019-01-13 10:15:00', '2019-01-13 11:31:20');
+INSERT INTO Visitors VALUES(7, 'Demian', 'Kowal', '2019-03-05 11:15:00', '2019-01-13 12:31:20');
+
+INSERT INTO PatientsVisitors VALUES(0, 0, 1); 
+INSERT INTO PatientsVisitors VALUES(1, 0, 1); 
+INSERT INTO PatientsVisitors VALUES(2, 2, 0); 
+INSERT INTO PatientsVisitors VALUES(3, 3, 0); 
+INSERT INTO PatientsVisitors VALUES(4, 4, 2); 
+INSERT INTO PatientsVisitors VALUES(5, 5, 2); 
+INSERT INTO PatientsVisitors VALUES(6, 6, 3); 
+INSERT INTO PatientsVisitors VALUES(7, 7, 4); 
+
+INSERT INTO DoctorSurgery  VALUES(0, 0, 0); 
+INSERT INTO DoctorSurgery  VALUES(1, 2, 0); 
+INSERT INTO DoctorSurgery  VALUES(2, 2, 0); 
+INSERT INTO DoctorSurgery  VALUES(3, 1, 0); 
+
+
+------------------------------------------------OLD TRIGGERS FROM PREVIOUS SEMESTER-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--Insert After Trigger 
+set serveroutput on;
+
+create or replace trigger PatienCount
+after insert on Patient
+DECLARE X INTEGER;
+BEGIN
+SELECT count(pName) into x from Patient;
+dbms_output.put_line ( 'Total amount of patients '||X||' ');
+end;
+/
+--how it works
+
+INSERT INTO Patient VALUES(6, 'red', 'bluel', 'Stodolna 4', 'Gniezno', 11-980, '2020-12-01');
+delete from Patient where idPatient = 6;    
+
+select * from Patient;
+
+
+--Update After Trigger
+create or replace trigger docSal
+after update of salary on Doctor
+for each row 
+begin
+if :new.salary > :old.salary then 
+DBMS_OUTPUT.PUT_LINE ('you got a raise 1 congrats');
+ end if;
+if :new.salary < :old.salary then 
+dbms_output.put_line ('oh no you should work harder, you earn shitty money');
+ end if;
+ end;
+/
+--how it works
+
+INSERT INTO Doctor  VALUES(4,'potato', 'gray ', 'surgeon', 12312089, 3000); 
+
+UPDATE Doctor
+SET salary = 4000
+WHERE idDoctor = 4 ;
+
+select * from Doctor;
+
+
+-- Delete After Trigger 
+create or replace trigger DocSpec
+after delete on Doctor
+for each row
+begin
+dbms_output.put_line ('Doctor ' || :old.docName || ' stopped working here' );
+end;
+/
+--how it works
+
+
+delete from doctor where idDoctor = 4;
+
+
+--Before Insert Trigger
+create or replace trigger sameDoc
+before insert on Doctor
+for each row 
+DECLARE X INTEGER := 0;
+Y integer;   
+begin
+select count(phoneNumber) into Y from Doctor where :new.phoneNumber = phoneNumber;
+if X < Y then 
+raise_application_error(-20001, 'doctor already exists');
+end if ;
+end;
+/
+--how it works
+INSERT INTO Doctor  VALUES(4,'blurPotato', 'black ', 'vet', 114145189, 3200); 
+INSERT INTO Doctor  VALUES(5,'blurPotato', 'black ', 'vet', 114145189, 3200); 
+
+
+
+
+--Before Update Trigger
+create or replace trigger spec
+before update on Doctor
+for each row
+begin
+if :old.specialization = :new.specialization then
+raise_application_error(-20020, 'doctor specialization is the same');
+end if;
+end;
+/
+--how it works
+UPDATE Doctor
+SET specialization = 'vet'
+WHERE idDoctor = 4 ;
+
+
+--before delete trigger
+create or replace trigger delDoc
+before delete on Doctor
+for each row
+declare X integer;
+begin
+select count(IdHDoctor) into X from doctorHistory;
+insert into doctorHistory values (X, :old.docName, :old.docSurname , :old.specialization, :old.phoneNumber, :old.salary);
+end;
+ /
+ --how it works
+ 
+delete from doctor where idDoctor = 4;
+
+select * from doctorHistory;
+
+--------------------------------------------------------------PROCEDURES-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--1st procedure
+--changing doctor's specialization from psychologist to nurse
+CREATE OR REPLACE PROCEDURE changeSpecialization
+AS
+oldd varchar2(50);
+--neww varchar2;
+wrong exception; 
+CURSOR c IS
+select specialization from doctor where specialization = 'psychologist';
+begin
+open c;
+loop
+fetch c into oldd;
+exit when c%notfound;
+UPDATE Doctor SET specialization='nurse' WHERE specialization=oldd;
+end loop;
+exception 
+when wrong then dbms_output.put_line('no psychologist found!');
+end;
+/
+EXECUTE changeSpecialization;
+
+SELECT * FROM Doctor;
+
+
+
+
+--2nd procedure
+--rising salaries of doctors whose specialization is pediatrist
+create or replace procedure riseSalaries
+as
+wrong exception;
+CURSOR c IS
+select salary from Doctor where specialization='pediatrist' for update;
+n NUMBER;
+begin
+open c;
+loop
+fetch c into n;
+exit when c%notfound;
+update Doctor set salary=n*1.2 where current of c;
+if c%rowcount=3 then
+DBMS_OUTPUT.PUT_LINE('salary of doctor with specialization pediatrist changed');
+end if;
+end loop;
+exception 
+when wrong then dbms_output.put_line('no pediatrist found, no salary raised!');
+end;
+/
+execute riseSalaries;
+
+select*from Doctor;
+
+
+
+
+
+
+--3rd procedure
+--displays the sum of all salaries given the specialization
+create or replace procedure SumOfSalaries(spec varchar2)
+as
+noSpecialization exception;
+countSpec number;
+sumOfSal integer;
+begin
+select count(idDoctor)
+into countSpec
+from Doctor
+where specialization = spec;
+if countSpec = 0 
+then raise noSpecialization;
+else
+select sum(NVL(salary,0))
+into sumOfSal
+from Doctor
+where Doctor.idDoctor = Doctor.idDoctor
+and Doctor.specialization = spec;
+dbms_output.put_line('Sum of salaries of doctors with specialization ' ||spec|| '  is equal to ' || sumOfSal);
+end if;
+exception 
+when noSpecialization then
+dbms_output.put_line('specialization such as ' || spec || 'not found');
+end;
+/
+
+execute sumOfSalaries('pediatrist');
+
+set serveroutput on;
+------------------------------------------TRIGGERS WITH CURSORS---------------------------------------------------------------------
+
+--1st table trigger
+--checking whether after updating or inserting on Patient no one has the same phone number, if they have we delete one
+
+create or replace trigger samePhoneNumber
+after update or insert on Patient
+declare cursor patient1 is select IdPatient from Patient;
+        currentPatient1 integer;
+        currentPatientName1 varchar2(40);
+        currentPhoneNoPat1 varchar2(9);
+        
+        cursor patient2 is select IdPatient from Patient where IdPatient <> currentPatient1;
+        currentPatient2 integer;
+        currentPhoneNoPat2 varchar2(9);
+        currentPatientName2 varchar2(40);
+        duplicatePhoneNumber exception;
+        
+        begin
+        open Patient1;
+        loop
+        fetch patient1 into currentPatient1;
+        exit when patient1 %notfound;
+        
+        open patient2;
+        loop
+        fetch patient2 into currentPatient2;
+        exit when patient2 %notfound;
+        
+        select Pname into currentPatientName1 from Patient where IdPatient = currentPatient1;
+        select phoneNumber into currentPhoneNoPat1 from Patient where IdPatient = currentPatient1;
+        select Pname into currentPatientName2 from Patient where IdPatient = currentPatient2;
+        select phoneNumber into currentPhoneNoPat2 from Patient where IdPatient = currentPatient2;
+        
+        if currentPatientName1 = currentPatientName2 and currentPhoneNoPat1 = currentPhoneNoPat2 and currentPatient1 <> currentPatient2 then
+        raise duplicatePhoneNumber;
+        end if;
+        end loop;
+        close patient2;
+        end loop;
+        close patient1;
+        
+        exception when duplicatePhoneNumber then
+        dbms_output.put_line(' dulicate phone number detected, removing '|| currentPatient2|| ' ' ||currentPatientName2||' with phone number: '||currentPhoneNoPat2);
+        
+        delete from Patient where IdPatient = currentPatient2;
+        end;
+        /
+        
+        insert into Patient values(6, 'Aleksa', 'Kowal', '434435437', 'Stodolna 9', 'Gniezno', 99-980, '2003-12-01');
+        select * from Patient;
+        
+        set serveroutput on;
+        
+        
+        
+--2nd Table Trigger 
+--copying the whole current Hospital crew by and saving their information in different table - Doctor History
+
+CREATE OR REPLACE TRIGGER DelDoctorrr
+BEFORE DELETE ON Doctor
+DECLARE
+    CURSOR deleteDoc IS SELECT IdDoctor FROM Doctor;
+    docid INTEGER;
+    noFinished EXCEPTION;
+    finCount INTEGER;
+BEGIN
+    SELECT COUNT(IdDoctor) INTO finCount FROM Doctor;
+    
+    IF finCount = 0 THEN
+        RAISE noFinished;
+    END IF;
+    
+    OPEN deleteDoc;
+    LOOP
+        FETCH deleteDoc INTO docid;
+        EXIT WHEN deleteDoc %NOTFOUND;
+        INSERT INTO DoctorHistory SELECT * FROM Doctor WHERE IdDoctor = docid;
+    END LOOP;
+    CLOSE deleteDoc;
+    
+    EXCEPTION
+        WHEN noFinished THEN
+            DBMS_OUTPUT.PUT_LINE('Currently there are no finished orders.');
+END;
+/
+
+
+delete from doctor where idDoctor = 5;
+INSERT INTO Doctor  VALUES(5,'Ola', 'Marciniak', 'surgeon', 123488089, 6000);
+select * from doctorHistory;
+select * from Doctor;
+        
+   
+
+   
+        
+ 
+ --3rd trigger
+ --whenever new Doctor is added, all doctors get a 350zl bonus salary
+
+ create or replace trigger doctorBonus
+ after insert on Doctor
+ for each row
+ declare
+ noDoctor exception;
+ docid integer;
+ docCount integer;
+ cursor doctorBonusCursor is select IdDoctor from Doctor;
+ begin
+ select count (IdDoctor) into docCount from Doctor;
+ if docCount = 0 then raise noDoctor;
+ end if;
+ select IdDoctor into docid from Doctor where idDoctor = :new.idDoctor;
+ open doctorBonusCursor;
+ loop
+    fetch doctorBonusCursor into docid;
+    exit when doctorBonusCursor%notfound;
+    update Doctor
+    set salary = salary + 350 where IdDoctor = docid;
+    end loop;
+    close doctorBonusCursor;
+    exception when noDoctor then dbms_output.put_line('There are no doctors at all');
+    end;
+    /
+    
+    
+   
+     INSERT INTO Doctor VALUES(4,'Ala', 'Kmiecik', 'surgeon', 123411089, 5100); 
+    set serveroutput on;
+    select * from Doctor;
+    
+
+
+ 
+
+
+--4th Before Delete row trigger. If we want to delete a surgery, but there are is some info about that surgery in a Doctor's Surgeries, it will delete them also.
+CREATE OR REPLACE TRIGGER SurgeryDeleted
+BEFORE DELETE ON Surgery
+FOR EACH ROW
+DECLARE
+    CURSOR surgeries IS SELECT IdSurgery FROM Surgery WHERE IdSurgery = :OLD.IdSurgery;
+    surgeryExists EXCEPTION;
+    entity INTEGER;
+    nu INTEGER;
+BEGIN
+    SELECT COUNT(IdSurgery) INTO entity FROM Surgery WHERE IdSurgery = :OLD.IdSurgery;
+    
+    DBMS_OUTPUT.PUT_LINE('Checking if there are surgeries to remove: ' || :OLD.IdSurgery);
+    
+    IF entity >= 1 THEN
+        DBMS_OUTPUT.PUT_LINE('There is a ' || entity || ' surgery for removal');
+        RAISE SurgeryExists;
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('surgery deleted.');
+    END IF;
+    
+    EXCEPTION
+        WHEN SurgeryExists THEN
+            OPEN surgeries;
+            LOOP
+                FETCH surgeries INTO nu;
+                EXIT WHEN surgeries %NOTFOUND;
+                UPDATE DoctorSurgery SET IdSurgery = NULL WHERE IdSurgery = nu;
+                DELETE FROM Surgery WHERE IdSurgery = null;
+            END LOOP;
+            CLOSE surgeries;
+            DBMS_OUTPUT.PUT_LINE('All data containing  ' || :OLD.IdSurgery || ' is now cleared');
+END;
+/
+
+DELETE FROM Surgery WHERE IdSurgery = 1;
